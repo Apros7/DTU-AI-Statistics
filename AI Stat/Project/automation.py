@@ -52,10 +52,11 @@ class Tester():
         _data_y = None,
         _all_data = None,
         _active_tqdm : bool = True,
+        _run_tests : bool = True
         ):
         if cross_validation_level == 2 and type(function_to_test) is not list: raise ValueError("You are doing two level cross validation. You should test multiple functions against each other. Please put them in a list.")
         self.func_to_test, self.final_test, self.k, self.cv_lvl = function_to_test, final_test, k, cross_validation_level
-        self.display_info, self._predetermined_data, self.data_x, self.data_y, self._active_tqdm, self._all_data = display_info, _predetermined_data, _data_x, _data_y, _active_tqdm, _all_data
+        self.display_info, self._predetermined_data, self.data_x, self.data_y, self._active_tqdm, self._all_data, self._run_tests = display_info, _predetermined_data, _data_x, _data_y, _active_tqdm, _all_data, _run_tests
         self.func_vars = [vars_to_test] if type(vars_to_test) is not list else vars_to_test
         self.results = []
         self._set_classification()
@@ -131,5 +132,6 @@ class Tester():
             self._one_hot_y_col()   
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
+        if not self._run_tests: return 
         if self.cv_lvl == 1: self._test_folds_and_save_error()
         if self.cv_lvl == 2: self._two_level_cross_validation()
