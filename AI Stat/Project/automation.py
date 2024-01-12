@@ -61,6 +61,8 @@ class Tester():
         self.results = []
         self._set_classification()
 
+    def get_data(self): return self.data_x, self.data_y
+    def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes), then use data_x[train_indexes], so on
     def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data()#; self._categorize_y_column();
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
