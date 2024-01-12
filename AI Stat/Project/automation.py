@@ -40,7 +40,7 @@ class Tester():
 
     def __init__(
         self, 
-        function_to_test, 
+        function_to_test = None, 
         final_test : bool = False, 
         k : int = 10, 
         vars_to_test = None,
@@ -62,7 +62,7 @@ class Tester():
         self._set_classification()
 
     def get_data(self): return self.data_x, self.data_y
-    def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes), then use data_x[train_indexes], so on
+    def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
     def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data()#; self._categorize_y_column();
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
@@ -93,6 +93,7 @@ class Tester():
         self.data = self._all_data if self._all_data is not None else self.data
         self._reset_index()
         unique_individuals = self.data["Individual"].unique()
+        if self.k is None: print(f"You set k to {self.k}, but changing to {len(unique_individuals)} as this is the number of individuals in the dataset, and the cross validation should be base on this")
         self.k = len(unique_individuals)
         self.data_folds = [self.data[self.data["Individual"] == individual].index for individual in unique_individuals]
 
@@ -135,5 +136,6 @@ class Tester():
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
         if not self._run_tests: return 
+        if self._run_tests and self.func_to_test is None: raise ValueError("You have to specify a function to test with func_to_test = ____")
         if self.cv_lvl == 1: self._test_folds_and_save_error()
         if self.cv_lvl == 2: self._two_level_cross_validation()
