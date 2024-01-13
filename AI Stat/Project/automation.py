@@ -63,13 +63,14 @@ class Tester():
 
     def get_data(self): return self.data_x, self.data_y
     def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
+    def get_data_columns(self): return self.x_cols, self.y_cols
     def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data()#; self._categorize_y_column();
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
     def _fix_data(self): self.data = self.data.astype({"Frustrated": str}); self.data = self.data[self.data["Cohort"] == "D1_2"]; self._reset_index()
     def _set_data_x(self, x_columns): self.data_x = torch.tensor(self.data[x_columns].values.astype(np.float32()))
     def _set_data_y(self, y_column): self.data_y = torch.tensor(self.data[y_column].values.astype(np.float32))
-    def _set_data_props(self, x_cols, y_col): self._set_data_x(x_cols); self._set_data_y(y_col)
+    def _set_data_props(self, x_cols, y_col): self._set_data_x(self.x_cols); self._set_data_y(self.y_col)
     def _unnest_lst(self, lst): return [item for sublist in lst for item in sublist]
     def _get_fold_combs_without_val(self): self.fold_combs = [(self._unnest_lst(self.data_folds[:i] + self.data_folds[i+1:]), self.data_folds[i]) for i in range(self.k)] # (train, test)
     def _get_fold_combs_with_val(self): self.fold_combs = [(self._unnest_lst(self.data_folds[:i] + self.data_folds[i+2:]), self.data_folds[i+1 if i+1 < self.k else 0], self.data_folds[i]) for i in range(self.k)] # (train, val, test)
@@ -128,10 +129,10 @@ class Tester():
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
-            x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
+            self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
             #y_col = ["HighlyFrustrated"]
-            y_col = "Frustrated"
-            self._set_data_props(x_cols, y_col)
+            self.y_col = "Frustrated"
+            self._set_data_props()
             self._one_hot_y_col()   
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
