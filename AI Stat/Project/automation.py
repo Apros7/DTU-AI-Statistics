@@ -73,12 +73,12 @@ class Tester():
 
     def get_data(self): return self.data_x, self.data_y
     def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
-    def get_data_columns(self): return self.x_cols, self.y_cols
+    def get_data_columns(self): return self.x_cols, self.y_col
     def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._normalize_x_columns()
     def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"])
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
-    def _fix_data(self): self.data = self.data.astype({"Frustrated": str}); self.data = self.data[self.data["Cohort"] == "D1_2"]; self._reset_index()
+    def _fix_data(self): self.data = self.data.astype({"Frustrated": str})#; self.data = self.data[self.data["Cohort"] == "D1_2"]; self._reset_index()
     def _set_data_x(self, x_columns): self.data_x = torch.tensor(self.data[x_columns].values.astype(np.float32()))
     def _set_data_y(self, y_column): self.data_y = torch.tensor(self.data[y_column].values.astype(np.float32))
     def _set_data_props(self): self._set_data_x(self.x_cols); self._set_data_y(self.y_col)
@@ -141,8 +141,8 @@ class Tester():
         if not self._predetermined_data:
             self._load_data()
             self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
-            #y_col = ["HighlyFrustrated"]
-            self.y_col = "Frustrated"
+            self.y_col = ["HighlyFrustrated"]
+            # self.y_col = "Frustrated"
             self._set_data_props()
             self._one_hot_y_col()   
         if self.cv_lvl == 2: self.final_test = True
