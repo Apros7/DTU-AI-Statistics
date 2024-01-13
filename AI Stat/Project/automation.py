@@ -43,7 +43,6 @@ def normalize_column(df, columns):
         max_val = data.max()
         normalized_column = (data - min_val) / (max_val - min_val)
         df[column] = normalized_column
-    print(df.head())
     return df
 
 class Tester():
