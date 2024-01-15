@@ -61,7 +61,7 @@ def train_model(model, criterion, optimizer, train_loader, epochs):
 
 def ann(x_train, x_test, y_train, y_test, func_var):
 
-    input_size = 14
+    input_size = 21
     # binary for status
     output_size = 11
     learning_rate = 1e-3

@@ -29,6 +29,7 @@ import torch
 from tqdm import tqdm
 from prettytable import PrettyTable
 import numpy as np
+import random
 
 def frust_class(x):
     if int(x) <= 3:
@@ -43,6 +44,11 @@ def normalize_column(df, columns):
         max_val = data.max()
         normalized_column = (data - min_val) / (max_val - min_val)
         df[column] = normalized_column
+    return df
+
+def rand_col(df):
+    df["rand"] = [random.choice(list(range(1, 15))) for _ in range(len(df))]
+    print(df.head(30))
     return df
 
 class Tester():
@@ -73,7 +79,8 @@ class Tester():
     def get_data(self): return self.data_x, self.data_y
     def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
     def get_data_columns(self): return self.x_cols, self.y_col
-    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._normalize_x_columns() #self._add_data(); 
+    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._normalize_x_columns(); self._add_rand_col() #self._add_data(); 
+    def _add_rand_col(self): self.data = rand_col(self.data)
     def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"])#, "All_6", "All_4"])
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _add_data(self): self._all_6(); self._all_4()
@@ -106,10 +113,12 @@ class Tester():
     def _set_init_data_folds(self): 
         self.data = self._all_data if self._all_data is not None else self.data
         self._reset_index()
-        unique_individuals = self.data["Individual"].unique()
+        # column_to_split_from = "Individual"
+        column_to_split_from = "rand"
+        unique_individuals = self.data[column_to_split_from].unique()
         if self.k is None: print(f"You set k to {self.k}, but changing to {len(unique_individuals)} as this is the number of individuals in the dataset, and the cross validation should be base on this")
         self.k = len(unique_individuals)
-        self.data_folds = [self.data[self.data["Individual"] == individual].index for individual in unique_individuals]
+        self.data_folds = [self.data[self.data[column_to_split_from] == individual].index for individual in unique_individuals]
 
     def _print_table(self, columns, data):
         table = PrettyTable()
@@ -143,7 +152,7 @@ class Tester():
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
-            self.x_cols = [(i+1) for i in range(14)]
+            self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "Puzzler"] + [(i+1) for i in range(14)]
             # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "All_6", "All_4"]
             # self.x_cols = ["HR_Min", "All_6", "All_4"]
             # self.y_col = ["Puzzler"]
