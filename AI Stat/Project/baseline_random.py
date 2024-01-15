@@ -4,12 +4,12 @@ import numpy as np
 from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score
 from collections import Counter
 import torch
+import random
 
 def baseline(x_train, x_test, y_train, y_test, func_var):
     y_train = torch.argmax(y_train, dim=1)
-    most_common_class = max(set(y_train), key=y_train.tolist().count)
-    y_pred = [most_common_class] * len(y_test)
-    y_pred = torch.tensor([t.item() for t in y_pred])
+    y_pred = [random.choice([0, 1]) for _ in range(len(y_test))]
+    y_pred = torch.tensor(y_pred)
     y_test = torch.argmax(y_test, dim=1)
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
