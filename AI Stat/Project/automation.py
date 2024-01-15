@@ -73,9 +73,12 @@ class Tester():
     def get_data(self): return self.data_x, self.data_y
     def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
     def get_data_columns(self): return self.x_cols, self.y_col
-    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._normalize_x_columns()
-    def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"])
+    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._add_data(); self._normalize_x_columns()
+    def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "All_6", "All_4"])
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
+    def _add_data(self): self._all_6(); self._all_4()
+    def _all_6(self): self.data["All_6"] = self.data["HR_Mean"] * self.data["HR_Median"] * self.data["HR_std"] * self.data["HR_Min"] * self.data["HR_Max"] * self.data["HR_AUC"] 
+    def _all_4(self): self.data["All_4"] = self.data["HR_Mean"] * self.data["HR_std"] * self.data["HR_Max"] * self.data["HR_AUC"] 
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
     def _fix_data(self): self.data = self.data.astype({"Frustrated": str}); #self.data = self.data[self.data["Cohort"] == "D1_1"]; self._reset_index()
     def _set_data_x(self, x_columns): self.data_x = torch.tensor(self.data[x_columns].values.astype(np.float32()))
@@ -140,13 +143,12 @@ class Tester():
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
-            self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
+            # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
+            self.x_cols = ["HR_Min", "All_6", "All_4"]
             self.y_col = ["HighlyFrustrated"]
             # self.y_col = "Frustrated"
             self._set_data_props()
-            print(self.data_y)
             self._one_hot_y_col() 
-            print(self.data_y)  
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
         if not self._run_tests: return 
