@@ -1,4 +1,4 @@
-from baseline import baseline
+from baseline_random import baseline
 from class_tree import ClassTree
 from KNN_tester import KNN
 from ANN_tester import ann
