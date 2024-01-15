@@ -77,7 +77,7 @@ class Tester():
     def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"])
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
     def _reset_index(self): self.data = self.data.reset_index(drop=True)
-    def _fix_data(self): self.data = self.data.astype({"Frustrated": str})#; self.data = self.data[self.data["Cohort"] == "D1_2"]; self._reset_index()
+    def _fix_data(self): self.data = self.data.astype({"Frustrated": str}); #self.data = self.data[self.data["Cohort"] == "D1_1"]; self._reset_index()
     def _set_data_x(self, x_columns): self.data_x = torch.tensor(self.data[x_columns].values.astype(np.float32()))
     def _set_data_y(self, y_column): self.data_y = torch.tensor(self.data[y_column].values.astype(np.float32))
     def _set_data_props(self): self._set_data_x(self.x_cols); self._set_data_y(self.y_col)
@@ -136,6 +136,7 @@ class Tester():
 
     def _set_classification(self):
         self.path_to_data = "Project/HR_data.csv"
+        # self.path_to_data = "HR_data.csv"
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
@@ -143,7 +144,9 @@ class Tester():
             self.y_col = ["HighlyFrustrated"]
             # self.y_col = "Frustrated"
             self._set_data_props()
-            self._one_hot_y_col()   
+            print(self.data_y)
+            self._one_hot_y_col() 
+            print(self.data_y)  
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
         if not self._run_tests: return 
