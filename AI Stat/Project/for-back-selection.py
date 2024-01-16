@@ -94,7 +94,7 @@ if __name__ == "__main__":
     data_x, data_y = tester.get_data()
     x_columns, y_columns = tester.get_data_columns()
     data_fold_indexes = tester.get_data_folds()
-    selector = Selector(data_x, data_y, x_columns, data_fold_indexes, print_info = False)
+    selector = Selector(data_x, data_y, x_columns, data_fold_indexes, print_info = True)
     selector.run_forward_selection(KNN, 8)
     selector.run_backward_selection(KNN, 8)
     selector.run_forward_selection(LogReg, 1)

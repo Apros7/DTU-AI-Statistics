@@ -172,9 +172,10 @@ class Tester():
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
-            # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "Puzzler"] + [(i+1) for i in range(14)]
+            # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]
+            self.x_cols = ['HR_Median', 'HR_Max', 'HR_Mean']
             # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "All_6", "All_4"]
-            self.x_cols = ["HR_Mean_rel", "HR_Median_rel", "HR_Max_rel"]
+            # self.x_cols = ["HR_Mean_rel", "HR_Median_rel", "HR_Max_rel"]
             # self.x_cols = ["HR_Min", "All_6", "All_4"]
             self.y_col = ["Puzzler"]
             # self.y_col = ["HighlyFrustrated"]
