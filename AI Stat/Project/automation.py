@@ -48,8 +48,27 @@ def normalize_column(df, columns):
 
 def rand_col(df):
     df["rand"] = [random.choice(list(range(1, 15))) for _ in range(len(df))]
+    return df
+
+def hr_dev_cols(df):
+    labels = {
+        "HR_Mean_rel": [],
+        "HR_Median_rel": [],
+        "HR_std_rel": [],
+        "HR_Min_rel": [],
+        "HR_Max_rel": [],
+        "HR_AUC_rel": []
+    }
+    for individual in df["Individual"].unique():
+        for key, column in zip(labels.keys(), ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"]):
+            phase1 = df[(df["Individual"] == individual) & (df["Phase"] == "phase1")][column].mean()
+            all_values = [(x - phase1) / phase1 for x in df[df["Individual"] == individual][column].values]
+            labels[key].extend(all_values)
+    for key, value in labels.items(): 
+        df[key] = value
     print(df.head(30))
     return df
+
 
 class Tester():
 
@@ -79,7 +98,8 @@ class Tester():
     def get_data(self): return self.data_x, self.data_y
     def get_data_folds(self): return self.fold_combs # List of (train_indexes, test_indexes) or (train_indexes, val_indexes, test_indexes), then use data_x[train_indexes], so on
     def get_data_columns(self): return self.x_cols, self.y_col
-    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._normalize_x_columns(); self._add_rand_col() #self._add_data(); 
+    def _load_data(self): self.data = pd.read_csv(self.path_to_data); self.columns = list(self.data.columns); self._fix_data(); self._categorize_y_column(); self._add_rel_cols(); self._normalize_x_columns(); self._add_rand_col(); #self._add_data();
+    def _add_rel_cols(self): self.data = hr_dev_cols(self.data)
     def _add_rand_col(self): self.data = rand_col(self.data)
     def _normalize_x_columns(self): self.data = normalize_column(self.data, ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC"])#, "All_6", "All_4"])
     def _categorize_y_column(self): self.data["HighlyFrustrated"] = self.data["Frustrated"].apply(frust_class)
@@ -152,13 +172,15 @@ class Tester():
         self.best_param_func = max
         if not self._predetermined_data:
             self._load_data()
-            self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "Puzzler"] + [(i+1) for i in range(14)]
+            # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "Puzzler"] + [(i+1) for i in range(14)]
             # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "All_6", "All_4"]
+            self.x_cols = ["HR_Mean_rel", "HR_Median_rel", "HR_std_rel", "HR_Min_rel", "HR_Max_rel", "HR_AUC_rel"]
             # self.x_cols = ["HR_Min", "All_6", "All_4"]
             # self.y_col = ["Puzzler"]
             self.y_col = ["HighlyFrustrated"]
             # self.y_col = "Frustrated"
             self._set_data_props()
+            print(self.data_x)
             self._one_hot_y_col() 
         if self.cv_lvl == 2: self.final_test = True
         self._set_folds()
