@@ -174,10 +174,10 @@ class Tester():
             self._load_data()
             # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "Puzzler"] + [(i+1) for i in range(14)]
             # self.x_cols = ["HR_Mean", "HR_Median", "HR_std", "HR_Min", "HR_Max", "HR_AUC", "All_6", "All_4"]
-            self.x_cols = ["HR_Mean_rel", "HR_Median_rel", "HR_std_rel", "HR_Min_rel", "HR_Max_rel", "HR_AUC_rel"]
+            self.x_cols = ["HR_Mean_rel", "HR_Median_rel", "HR_Max_rel"]
             # self.x_cols = ["HR_Min", "All_6", "All_4"]
-            # self.y_col = ["Puzzler"]
-            self.y_col = ["HighlyFrustrated"]
+            self.y_col = ["Puzzler"]
+            # self.y_col = ["HighlyFrustrated"]
             # self.y_col = "Frustrated"
             self._set_data_props()
             print(self.data_x)
