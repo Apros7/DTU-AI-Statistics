@@ -17,6 +17,8 @@ class SimpleNN(nn.Module):
         self.layers = nn.Sequential(
             nn.Linear(input_size, h),
             nn.ReLU(),  
+            nn.Linear(h, h_to_test),
+            nn.ReLU(),  
             nn.Linear(h, output_size),
             nn.Sigmoid(),
         )
@@ -45,7 +47,7 @@ def get_predictions(test_x, model):
 def train_model(model, criterion, optimizer, train_loader, epochs):
     losses = []
     model.train()
-    for epoch in range(epochs):
+    for epoch in tqdm(range(epochs)):
         for i, (inputs, labels) in enumerate(train_loader):
             optimizer.zero_grad() 
             outputs = model(inputs)
@@ -65,7 +67,7 @@ def ann(x_train, x_test, y_train, y_test, func_var):
     # binary for status
     output_size = 11
     learning_rate = 1e-3
-    epochs = 100
+    epochs = 500
     batch_size = 32
     h = func_var
 
@@ -80,11 +82,10 @@ def ann(x_train, x_test, y_train, y_test, func_var):
     raw_predictions = get_predictions(x_test, model)
     predictions = np.argmax(raw_predictions, axis=1)
     y_test = np.argmax(y_test, axis=1)
-    print("done")
 
     return accuracy_score(predictions, y_test)
 
 if __name__ == "__main__":
     h_to_test = [128, 256, 512, 1024, 2048]
-    # h_to_test = 2048
+    h_to_test = 2048
     tester = Tester(function_to_test = ann, final_test = True, k = 14, vars_to_test=h_to_test)
